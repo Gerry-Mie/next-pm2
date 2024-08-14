@@ -46,13 +46,13 @@ COPY --chown=www-data:www-data . /app
 RUN npm install
 
 # Install Composer dependencies
-RUN composer install
+#RUN composer install
 
 # Expose port 3102
 EXPOSE 3102
 
 # Change current user to www
 USER www-data
-
+CMD ["php-fpm"]
 # Start PHP server with artisan
 CMD ["php", "artisan", "serve", "--port=3102"]
