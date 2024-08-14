@@ -1,10 +1,10 @@
-# Start with the official PHP 8.1 FPM image based on Alpine
+# Start with the official PHP 8.2 FPM image based on Alpine
 FROM php:8.2-alpine
 
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies
+# Update and Install system dependencies
 RUN apk update && apk add --no-cache \
     build-base \
     libpng-dev \
@@ -21,11 +21,13 @@ RUN apk update && apk add --no-cache \
     libxml2-dev \
     libzip-dev \
     libmcrypt-dev \
-    fcgi \
-    # Install Node.js and npm
-    && curl -fsSL https://unofficial-builds.nodejs.org/download/release/v16.3.0/node-v16.3.0-linux-x64.tar.xz | tar -xJ -C /usr/local --strip-components=1 \
-    # Install PHP extensions
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    fcgi
+
+# Install Node.js and npm using a trusted source
+RUN apk add --no-cache nodejs npm
+
+# Install PHP extensions
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip
 
 # Install Composer
@@ -49,5 +51,5 @@ EXPOSE 3102
 # Change current user to www
 USER www-data
 
-# Start PHP-FPM server
+# Start PHP server with artisan
 CMD ["php", "artisan", "serve", "--port=3102"]
