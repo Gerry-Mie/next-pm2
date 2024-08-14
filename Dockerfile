@@ -50,9 +50,6 @@ RUN npm install
 
 # Expose port 9000 (PHP-FPM default port)
 EXPOSE 9000
-EXPOSE 3102
 
 # Start PHP-FPM server
-#CMD ["php-fpm"]
-
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=3102"]
+CMD ["php-fpm"]
