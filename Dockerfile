@@ -1,15 +1,15 @@
 # Start with the official PHP 8.2 FPM image based on Alpine
-FROM php:8.2-alpine
+FROM php:8.2-fpm
 
 # Set working directory
 WORKDIR /app
 
-# Update and Install system dependencies
-RUN apk update && apk add --no-cache \
-    build-base \
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
     libpng-dev \
-    libjpeg-turbo-dev \
-    freetype-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev \
     locales \
     zip \
     jpegoptim optipng pngquant gifsicle \
@@ -17,21 +17,24 @@ RUN apk update && apk add --no-cache \
     unzip \
     git \
     curl \
-    oniguruma-dev \
+    libonig-dev \
     libxml2-dev \
     libzip-dev \
     libmcrypt-dev \
-    fcgi
-
-# Install Node.js and npm using a trusted source
-RUN apk add --no-cache nodejs npm
-
-# Install PHP extensions
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    libfcgi-bin \
+    # Install Node.js and npm
+    && curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
+    && apt-get install -y nodejs \
+    && apt-get clean -y \
+    && rm -rf /var/lib/apt/lists/* \
+    # Install PHP extensions
     && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip
 
 # Install Composer
 COPY --from=composer:2.5 /usr/bin/composer /usr/bin/composer
+
+# Clear cache
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copy existing application directory contents
 COPY . /app
