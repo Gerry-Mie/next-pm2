@@ -1,8 +1,8 @@
-# Start with the official PHP 8.2 FPM image based on Alpine
+# Start with the official PHP 8.1 FPM image
 FROM php:8.2-fpm
 
 # Set working directory
-WORKDIR /app
+WORKDIR /var/www/html
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -37,22 +37,19 @@ COPY --from=composer:2.5 /usr/bin/composer /usr/bin/composer
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copy existing application directory contents
-COPY . /app
+COPY . /var/www/html
 
 # Copy existing application directory permissions
-COPY --chown=www-data:www-data . /app
+COPY --chown=www-data:www-data . /var/www/html
 
 # Install npm packages
 RUN npm install
 
-# Install Composer dependencies
-#RUN composer install
-
-# Expose port 3102
-EXPOSE 3102
-
 # Change current user to www
-USER www-data
+#USER www-data
+
+# Expose port 9000 (PHP-FPM default port)
+EXPOSE 9000
+
+# Start PHP-FPM server
 CMD ["php-fpm"]
-# Start PHP server with artisan
-CMD ["php", "artisan", "serve", "--port=3102"]
